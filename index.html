@@ -373,7 +373,7 @@
         <div class="video-controls">
             <button class="control-btn" id="btn-mic" title="Toggle Mic" onclick="toggleMic()">🎤</button>
             <button class="control-btn" id="btn-cam" title="Toggle Cam" onclick="toggleCam()">📷</button>
-            <button class="control-btn" title="AI Shield" onclick="alert('AI Monitor: Scanning for harsh language.')">🛡️</button>
+            <button class="control-btn" title="Safety Shield" onclick="alert('Safety Monitor: Please follow our emotional awareness guidelines.')">🛡️</button>
             <div id="call-timer" style="color: white; font-family: monospace; font-size: 1.2rem; display: flex; align-items: center; padding: 0 1rem; font-weight: bold;">20:00</div>
             
             <button class="control-btn" title="Next Peer" onclick="nextPeer()" style="background: #eab308; color: white;">⏭️</button>
@@ -421,6 +421,13 @@
         // --- Core Variables ---
         let selectedMood = localStorage.getItem('userMood') || 'okay';
         let selectedRole = localStorage.getItem('userRole') || 'speaker'; 
+
+        // FIX: Force the buttons to match the hidden memory when the page loads
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('btn-speak').classList.remove('active');
+            document.getElementById('btn-listen').classList.remove('active');
+            document.getElementById('btn-' + (selectedRole === 'speaker' ? 'speak' : 'listen')).classList.add('active');
+        });
 
         function selectMood(el) {
             document.querySelectorAll('.mood-bubble').forEach(m => m.classList.remove('selected'));
