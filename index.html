@@ -497,7 +497,7 @@
 
         async function syncUserWithBackend(user) {
             const token = await user.getIdToken();
-            const res = await fetch('http://localhost:3001/api/auth/login', {
+            const res = await fetch('https://youwho-api.onrender.com/api/auth/login', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -544,7 +544,7 @@
                 }
 
                 const token = await user.getIdToken();
-                socket = io('http://localhost:3001', { auth: { token } });
+                socket = io('https://youwho-api.onrender.com', { auth: { token } });
 
                 socket.on('connect_error', (err) => {
                     document.getElementById('waiting-overlay').innerHTML = `<h2>Connection Failed</h2><p>${err.message}</p>`;
