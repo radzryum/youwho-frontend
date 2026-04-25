@@ -373,7 +373,7 @@
         <div class="video-controls">
             <button class="control-btn" id="btn-mic" title="Toggle Mic" onclick="toggleMic()">🎤</button>
             <button class="control-btn" id="btn-cam" title="Toggle Cam" onclick="toggleCam()">📷</button>
-            <button class="control-btn" title="AI Shield" onclick="alert('AI Monitor: Scanning for harsh language.')">🛡️</button>
+            <button class="control-btn" title="Safety Shield" onclick="alert('Safety Monitor: Please follow our emotional awareness guidelines.')">🛡️</button>
             <div id="call-timer" style="color: white; font-family: monospace; font-size: 1.2rem; display: flex; align-items: center; padding: 0 1rem; font-weight: bold;">20:00</div>
             
             <button class="control-btn" title="Next Peer" onclick="nextPeer()" style="background: #eab308; color: white;">⏭️</button>
@@ -584,7 +584,22 @@
                         }
                     }, 1000);
                     
-                    pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+                    // --- METERED TURN SERVER INTEGRATION ---
+                    pc = new RTCPeerConnection({ 
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            {
+                                urls: 'turn:global.relay.metered.ca:80', 
+                                username: 'a0cb64c662886d412525d87e',       
+                                credential: 'QCOVc6niZTzbgkg5'      
+                            },
+                            {
+                                urls: 'turn:global.relay.metered.ca:443', 
+                                username: 'a0cb64c662886d412525d87e',
+                                credential: 'QCOVc6niZTzbgkg5'
+                            }
+                        ] 
+                    });
 
                     if (localStream) {
                         localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
