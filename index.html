@@ -373,7 +373,7 @@
         <div class="video-controls">
             <button class="control-btn" id="btn-mic" title="Toggle Mic" onclick="toggleMic()">🎤</button>
             <button class="control-btn" id="btn-cam" title="Toggle Cam" onclick="toggleCam()">📷</button>
-            <button class="control-btn" title="Safety Shield" onclick="alert('Safety Monitor: Please follow our emotional awareness guidelines.')">🛡️</button>
+            <button class="control-btn" title="AI Shield" onclick="alert('AI Monitor: Scanning for harsh language.')">🛡️</button>
             <div id="call-timer" style="color: white; font-family: monospace; font-size: 1.2rem; display: flex; align-items: center; padding: 0 1rem; font-weight: bold;">20:00</div>
             
             <button class="control-btn" title="Next Peer" onclick="nextPeer()" style="background: #eab308; color: white;">⏭️</button>
@@ -497,7 +497,7 @@
 
         async function syncUserWithBackend(user) {
             const token = await user.getIdToken();
-            const res = await fetch('https://youwho-api.onrender.com/api/auth/login', {
+            const res = await fetch('http://localhost:3001/api/auth/login', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -544,7 +544,7 @@
                 }
 
                 const token = await user.getIdToken();
-                socket = io('https://youwho-api.onrender.com', { auth: { token } });
+                socket = io('http://localhost:3001', { auth: { token } });
 
                 socket.on('connect_error', (err) => {
                     document.getElementById('waiting-overlay').innerHTML = `<h2>Connection Failed</h2><p>${err.message}</p>`;
