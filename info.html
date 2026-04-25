@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>YouWho! - Information</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --soft-teal: #48c9b0;
+            --soft-purple: #c3b1e1;
+            --text-main: #2d3748;
+            --text-muted: #475569;
+            --menu-bg: #161525; 
+            --primary-orange: #ff8c42;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background: var(--bg-gradient);
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+            color: var(--text-main);
+        }
+
+        /* --- Header --- */
+        .global-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 3rem; width: 100%; z-index: 100;
+            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .logo-area { display: flex; align-items: center; gap: 0.5rem; font-size: 2rem; font-weight: 900; color: var(--primary-orange); cursor: pointer; text-decoration: none;}
+        .logo-area span { color: var(--soft-teal); }
+
+        .back-btn {
+            background: var(--soft-teal); color: white; border: none; 
+            font-size: 1rem; cursor: pointer; padding: 0.6rem 1.5rem; 
+            border-radius: 50px; transition: background 0.2s; font-weight: bold;
+            text-decoration: none;
+        }
+        .back-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        /* --- Layout --- */
+        .layout-container {
+            display: flex; flex: 1; overflow: hidden; width: 100%; 
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            width: 280px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255,255,255,0.6); display: flex; flex-direction: column;
+            padding: 2rem 0; overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600; color: var(--text-muted);
+            cursor: pointer; transition: 0.2s; border-left: 4px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.8); color: var(--soft-teal); }
+        .nav-item.active { background: white; color: var(--soft-teal); border-left-color: var(--soft-teal); }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex: 1; padding: 3rem; overflow-y: auto;
+        }
+
+        .content-section { display: none; animation: fadeIn 0.4s ease; max-width: 1200px; margin: 0 auto; }
+        .content-section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.6); border-radius: 20px;
+            padding: 3.5rem; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; color: #1e293b; }
+        h2 { font-size: 1.8rem; margin-top: 1.5rem; margin-bottom: 0.8rem; color: var(--soft-teal); }
+        p { font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.2rem; color: #334155; }
+        ul { margin-left: 1.5rem; margin-bottom: 1.2rem; }
+        li { font-size: 1.05rem; line-height: 1.7; color: #334155; margin-bottom: 0.5rem;}
+
+        /* --- Team Row Styles --- */
+        .team-row-container {
+            display: flex; justify-content: space-between; gap: 1.5rem; width: 100%; margin-top: 2rem;
+        }
+        .team-card {
+            flex: 1; background: white; border-radius: 15px; padding: 2rem 1rem; text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; align-items: center;
+        }
+        .team-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        
+        .team-photo-container {
+            width: 120px; height: 120px; border-radius: 50%; overflow: hidden;
+            border: 4px solid var(--soft-teal); margin-bottom: 1rem;
+            display: flex; justify-content: center; align-items: center; background: #f1f5f9;
+        }
+        .team-photo { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+        
+        .team-name { font-weight: bold; font-size: 1.2rem; color: #1e293b; margin-bottom: 0.2rem; }
+        .team-title { font-size: 0.85rem; color: var(--primary-orange); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+
+        /* --- Docs Grid Styles --- */
+        .proof-container { margin-top: 3rem; border-top: 2px solid rgba(0,0,0,0.05); padding-top: 2rem;}
+        .documentation-card-row {
+            display: flex; justify-content: space-between; gap: 2rem; margin-top: 1.5rem;
+        }
+        .documentation-card {
+            flex: 1; background: white; border-radius: 15px; overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: transform 0.2s;
+        }
+        .documentation-card:hover { transform: translateY(-3px); }
+        .documentation-photo { width: 100%; height: 260px; object-fit: cover; object-position: center; }
+        .doc-caption { padding: 1.2rem; font-size: 1rem; font-weight: 500; text-align: center; color: #475569; border-top: 1px solid #e2e8f0; }
+
+        @media (max-width: 1024px) {
+            .team-row-container, .documentation-card-row { flex-direction: column; gap: 1.5rem; }
+            .team-card { width: 100%; }
+        }
+
+        /* Form Styles */
+        input, textarea { width: 100%; padding: 1rem; border-radius: 10px; border: 1px solid #cbd5e1; margin-bottom: 1rem; outline: none; font-size: 1rem; }
+        input:focus, textarea:focus { border-color: var(--soft-teal); }
+        .btn-submit { background: var(--soft-teal); color: white; border: none; padding: 1rem 2rem; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(72, 201, 176, 0.4); }
+
+    </style>
+</head>
+<body>
+
+    <header class="global-header">
+        <a href="index.html" class="logo-area">
+            🦉 You<span>Who!</span>
+        </a>
+        <a href="index.html" class="back-btn">← Back to App</a>
+    </header>
+
+    <div class="layout-container">
+        <div class="sidebar">
+            <div class="nav-item active" onclick="showSection('about')">About Us</div>
+            <div class="nav-item" onclick="showSection('safety')">Safety</div>
+            <div class="nav-item" onclick="showSection('community')">Community</div>
+            <div class="nav-item" onclick="showSection('privacy')">Privacy Policy</div>
+            <div class="nav-item" onclick="showSection('terms')">Terms Of Service</div>
+            <div class="nav-item" onclick="showSection('faq')">FAQ</div>
+            <div class="nav-item" onclick="showSection('contact')">Contact Us</div>
+        </div>
+
+        <div class="content-area">
+            
+            <div id="section-about" class="content-section active">
+                <div class="glass-card">
+                    <h1 style="color: var(--soft-teal); text-align: center; margin-bottom: 1.5rem;">Introducing Team P.O.O.C.H.</h1>
+                    <p style="text-align: center; font-size: 1.15rem;"><strong>P.O.O.C.H.</strong> stands for <em>Peer Outreach, Offering Care & Help</em>.</p>
+                    <p style="text-align: center;">We are the passionate creators behind YouWho!, a platform dedicated to fostering emotional awareness and providing a safe space for individuals to speak and be heard. Our mission is to bridge the gap between isolation and connection by utilizing logical matching systems rather than automated AI sentiment tracking.</p>
+                    
+                    <h2 style="text-align: center; margin-top: 3rem;">Meet the Leadership Team</h2>
+                    
+                    <div class="team-row-container">
+                        <div class="team-card">
+                            <div class="team-photo-container">
+                                <img src="RADYN.jpg" alt="Radyn Ryu Maloles" class="team-photo">
+                            </div>
+                            <div class="team-name">Radyn Ryu Maloles</div>
+                            <div class="team-title">Chief Executive Officer<br>(CEO)</div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-photo-container">
+                                <img src="CASSIE.png" alt="Cassandra Nicole Sante" class="team-photo">
+                            </div>
+                            <div class="team-name">Cassandra Nicole Sante</div>
+                            <div class="team-title">Chief Operating Officer<br>(COO)</div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-photo-container">
+                                <img src="ELROB.jpg" alt="Elrob Jhon Irabon" class="team-photo">
+                            </div>
+                            <div class="team-name">Elrob Jhon Irabon</div>
+                            <div class="team-title">Chief Technology Officer<br>(CTO)</div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-photo-container">
+                                <img src="ROSELLE.png" alt="Roselle Pinca" class="team-photo">
+                            </div>
+                            <div class="team-name">Roselle Pinca</div>
+                            <div class="team-title">Chief Marketing Officer<br>(CMO)</div>
+                        </div>
+                    </div>
+
+                    <div class="proof-container">
+                        <h2 style="text-align: center;">Professional Documentation & Testing</h2>
+                        <p style="text-align: center; margin-bottom: 2rem;">To ensure our platform provides a safe and effective environment for emotional awareness, Team P.O.O.C.H. actively consults with professionals, rigorous beta testers, and utilizes agile frameworks to develop our service guidelines.</p>
+                        
+                        <div class="documentation-card-row">
+                            <div class="documentation-card">
+                                <img src="consult.jpg" alt="Professional consultation photo" class="documentation-photo">
+                                <div class="doc-caption">Team P.O.O.C.H. framework consultation with a licensed psychologist to establish safe peer connection protocols.</div>
+                            </div>
+                            <div class="documentation-card">
+                                <img src="review.png" alt="Consultation notes" class="documentation-photo">
+                                <div class="doc-caption">Reviewing peer support boundaries, UI flow, and emotional safety guidelines during our development workshop.</div>
+                            </div>
+                        </div>
+
+                        <div class="documentation-card-row">
+                            <div class="documentation-card">
+                                <img src="trying.jpg" alt="Students testing YouWho" class="documentation-photo">
+                                <div class="doc-caption">Local students in Cabuyao participating in our beta testing phase, providing valuable feedback on the YouWho matchmaking experience.</div>
+                            </div>
+                            <div class="documentation-card">
+                                <img src="meeting.jpg" alt="Team P.O.O.C.H. meeting" class="documentation-photo">
+                                <div class="doc-caption">Team P.O.O.C.H. conducting an agile sprint meeting to map out platform architecture and community safety features.</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-safety" class="content-section">
+                <div class="glass-card">
+                    <h1>Safety Guidelines</h1>
+                    <p>Your physical and emotional safety is our absolute highest priority. YouWho is a platform for peer support, not professional crisis intervention.</p>
+                    
+                    <h2>If You Are in Immediate Crisis</h2>
+                    <p>If you or someone else is in immediate physical danger, or experiencing a mental health emergency, please immediately contact professional help or local emergency services.</p>
+                    
+                    <h2>Reporting Bad Behavior</h2>
+                    <p>We maintain a zero-tolerance policy for harassment, bullying, or inappropriate content. Because video feeds are NOT recorded for privacy reasons, we rely on users to skip and report bad actors.</p>
+                    <ul>
+                        <li>If you feel uncomfortable, click the "Skip" (Next Peer) button immediately.</li>
+                        <li>Do not share personally identifiable information (real name, address, school).</li>
+                        <li>Do not send or request money.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="section-community" class="content-section">
+                <div class="glass-card">
+                    <h1>Community Standards</h1>
+                    <p>We are building a sanctuary for the local community and beyond. Every user is expected to contribute to a culture of empathy and respect.</p>
+                    
+                    <h2>How to be a Great Listener</h2>
+                    <ul>
+                        <li><strong>Listen to Understand, Not to Reply:</strong> Give the speaker the space to finish their thoughts without interrupting.</li>
+                        <li><strong>Validate Feelings:</strong> Use phrases like "That sounds incredibly stressful" instead of "Don't worry about it."</li>
+                        <li><strong>Avoid Fixing:</strong> Most people just want to be heard, not given immediate solutions to their problems.</li>
+                    </ul>
+                    
+                    <h2>How to be a Great Speaker</h2>
+                    <ul>
+                        <li><strong>Be Respectful of Boundaries:</strong> If a listener seems overwhelmed, ask if they are okay to continue the topic.</li>
+                        <li><strong>Utilize the Cards:</strong> If you aren't sure what to say, use the prompt cards at the bottom of the screen to guide your thoughts.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="section-privacy" class="content-section">
+                <div class="glass-card">
+                    <h1>Privacy Policy</h1>
+                    <p>Last Updated: April 2026</p>
+                    <p>Team P.O.O.C.H. deeply respects your privacy. Because the core feature of YouWho! is anonymous emotional support, we collect the bare minimum amount of data required to operate the service.</p>
+                    
+                    <h2>What We Don't Collect</h2>
+                    <ul>
+                        <li><strong>Video & Audio:</strong> Your WebRTC video and audio streams are encrypted end-to-end. We do not record, store, or analyze your video calls.</li>
+                        <li><strong>Real Identity:</strong> When you create an Anonymous Alias, your real name is never tied to your public profile.</li>
+                    </ul>
+
+                    <h2>What We Do Collect</h2>
+                    <ul>
+                        <li><strong>Authentication Data:</strong> Your email address (via Google Auth or manual signup) is stored securely via Firebase strictly for login and account recovery purposes.</li>
+                        <li><strong>Session Data:</strong> We temporarily track your chosen "Mood" and "Topic" strictly to route you through our matchmaking algorithm. This data is discarded when the session ends.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="section-terms" class="content-section">
+                <div class="glass-card">
+                    <h1>Terms of Service</h1>
+                    <p>By accessing or using YouWho!, you agree to be bound by these Terms.</p>
+                    
+                    <h2>Eligibility</h2>
+                    <p>You must be at least 18 years of age to use this platform. By creating an account, you warrant that you meet this age requirement.</p>
+
+                    <h2>Nature of Service</h2>
+                    <p>YouWho! provides a platform for peer-to-peer emotional support. <strong>We are not a substitute for professional medical, psychological, or psychiatric advice, diagnosis, or treatment.</strong> You agree that Team P.O.O.C.H. and YouWho! are not liable for any actions taken based on conversations had on this platform.</p>
+
+                    <h2>Prohibited Conduct</h2>
+                    <p>You agree not to use the service to:</p>
+                    <ul>
+                        <li>Transmit sexually explicit, abusive, or hateful content.</li>
+                        <li>Impersonate any person, professional, or entity.</li>
+                        <li>Harvest or collect data about other users.</li>
+                    </ul>
+                    <p>Violation of these terms will result in an immediate, permanent ban.</p>
+                </div>
+            </div>
+
+            <div id="section-faq" class="content-section">
+                <div class="glass-card">
+                    <h1>Frequently Asked Questions</h1>
+                    
+                    <h2>Is YouWho! really free?</h2>
+                    <p>Yes. Every user receives free, anonymous 20-minute support sessions. We also offer a Premium tier that unlocks unlimited time and access to verified professional guides.</p>
+
+                    <h2>Is my conversation being recorded?</h2>
+                    <p>Absolutely not. The video and audio feeds use WebRTC technology, meaning the connection is directly between you and your peer. The data never passes through a recording server.</p>
+
+                    <h2>How does the matchmaking work?</h2>
+                    <p>We use a strict logical algorithm. We pair one "Speaker" with one "Listener" who have both selected the exact same Emotional State and chosen the same conversational Topic. We do not use AI sentiment analysis; we rely on your chosen inputs.</p>
+
+                    <h2>What if I match with a troll?</h2>
+                    <p>Click the yellow "Next Peer" button on your control panel to immediately disconnect and be thrown back into the queue for a new, safer match.</p>
+                </div>
+            </div>
+
+            <div id="section-contact" class="content-section">
+                <div class="glass-card">
+                    <h1>Contact Team P.O.O.C.H.</h1>
+                    <p>Have questions, feedback, or need to report a technical issue? Send us a message and we will get back to you as soon as possible.</p>
+                    
+                    <form onsubmit="event.preventDefault(); alert('Thank you for reaching out! Team P.O.O.C.H. will review your message shortly.'); this.reset();">
+                        <label style="font-weight: bold; color: #1e293b; display: block; margin-bottom: 0.5rem;">Your Alias or Name</label>
+                        <input type="text" placeholder="Enter your name or YouWho alias" required>
+                        
+                        <label style="font-weight: bold; color: #1e293b; display: block; margin-bottom: 0.5rem;">Email Address</label>
+                        <input type="email" placeholder="So we can reply to you" required>
+                        
+                        <label style="font-weight: bold; color: #1e293b; display: block; margin-bottom: 0.5rem;">Message</label>
+                        <textarea rows="6" placeholder="How can we help?" required></textarea>
+                        
+                        <button type="submit" class="btn-submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // Add active class to clicked nav item
+            event.target.classList.add('active');
+
+            // Hide all content sections
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            // Show the target section
+            document.getElementById('section-' + sectionId).classList.add('active');
+        }
+
+        // Check if URL has a hash to load specific page (e.g., info.html#safety)
+        window.onload = function() {
+            const hash = window.location.hash.substring(1);
+            if (hash && document.getElementById('section-' + hash)) {
+                const navItems = document.querySelectorAll('.nav-item');
+                for (let item of navItems) {
+                    if (item.getAttribute('onclick').includes(hash)) {
+                        item.click();
+                        break;
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+</html>

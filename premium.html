@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouWho! - Premium Upgrade</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --soft-teal: #48c9b0;
+            --premium-gold: #fbbf24;
+            --text-main: #2d3748;
+            --menu-bg: #161525; 
+            --primary-orange: #ff8c42;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background: var(--bg-gradient);
+            display: flex; flex-direction: column;
+            min-height: 100vh; overflow-x: hidden; color: var(--text-main);
+        }
+
+        /* --- Global Header --- */
+        .global-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 3rem; width: 100%; z-index: 100;
+        }
+        .logo-area { display: flex; align-items: center; gap: 0.5rem; font-size: 2rem; font-weight: 900; color: var(--primary-orange); cursor: pointer; }
+        .logo-area span { color: var(--soft-teal); }
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+        .hamburger-btn {
+            background: var(--menu-bg); color: white; border: none; 
+            font-size: 1.5rem; cursor: pointer; padding: 0.5rem 0.8rem; 
+            border-radius: 8px; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .hamburger-btn:hover { background: var(--primary-orange); }
+
+        .more-menu {
+            position: fixed; top: 20px; right: 20px; width: 300px; background-color: var(--menu-bg); color: white;
+            border-radius: 16px; padding: 1rem 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: none; flex-direction: column; z-index: 200;
+        }
+        .more-menu.active { display: flex; }
+        .menu-header { display: flex; justify-content: space-between; padding: 0 1.5rem 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 1.2rem; font-weight: 500; }
+        .menu-header .close-btn { cursor: pointer; font-size: 1.5rem; }
+        .menu-header .close-btn:hover { color: #fc8181; }
+        .more-menu ul { list-style: none; padding: 0; margin-top: 0.5rem; }
+        .more-menu li { padding: 1rem 1.5rem; cursor: pointer; font-size: 1.05rem; transition: 0.2s;}
+        .more-menu li:hover { background-color: rgba(255,255,255,0.1); color: var(--soft-teal);}
+
+        /* --- Glass Panel --- */
+        .content-area { flex: 1; display: flex; justify-content: center; align-items: center; padding: 2rem; }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.6); border-radius: 25px;
+            padding: 3rem; width: 100%; max-width: 900px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column;
+        }
+
+        h1 { font-size: 3rem; text-align: center; margin-bottom: 0.5rem; color: #1e293b; }
+        p.subtitle { text-align: center; font-size: 1.2rem; color: #475569; margin-bottom: 2rem; font-weight: 500;}
+        
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+        .pricing-card { 
+            background: rgba(255,255,255,0.8); padding: 2.5rem 1.5rem; border-radius: 20px; 
+            text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        .pricing-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .pricing-card.popular { border-color: var(--premium-gold); background: white; position: relative; }
+        .popular-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--premium-gold); color: #1e293b; font-size: 0.85rem; font-weight: 900; padding: 0.4rem 1rem; border-radius: 12px; letter-spacing: 1px;}
+        .pricing-card h3 { font-size: 1.3rem; margin-bottom: 1rem; color: #334155; }
+        .pricing-card .price { font-size: 3rem; font-weight: 900; margin-bottom: 0.2rem; color: #1e293b; }
+        .pricing-card .duration { font-size: 1rem; margin-bottom: 0; color: #64748b; font-weight: bold;}
+        
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 2.5rem 0; }
+        .feature-item { background: rgba(255,255,255,0.5); padding: 1.5rem; border-radius: 15px; border-left: 5px solid var(--soft-teal); text-align: left; transition: 0.2s;}
+        .feature-item:hover { background: rgba(255,255,255,0.8); }
+        .feature-item h4 { margin-bottom: 0.5rem; font-size: 1.1rem; color: #1e293b;}
+        .feature-item .free { text-decoration: line-through; color: #94a3b8; font-size: 0.95rem; margin-right: 0.8rem;}
+        .feature-item .premium { color: var(--soft-teal); font-weight: bold; font-size: 1.05rem;}
+        .beta-tag { background: #ea580c; color: white; padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.8rem; vertical-align: middle;}
+
+        .btn { width: 100%; max-width: 400px; margin: 0 auto; padding: 1.2rem; border-radius: 50px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; display: block; text-align: center; }
+        .btn:hover { transform: scale(1.03); box-shadow: 0 10px 25px rgba(251, 191, 36, 0.4); }
+        .btn-primary { background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #1e293b; }
+        
+        .guarantee { text-align: center; font-size: 0.9rem; color: #475569; margin-top: 1.5rem; font-weight: 500;}
+    </style>
+</head>
+<body>
+
+    <header class="global-header">
+        <div class="logo-area" onclick="window.location.href='index.html'">
+            🦉 You<span>Who!</span>
+        </div>
+        <div class="header-actions">
+            <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
+        </div>
+    </header>
+
+    <div id="more-menu" class="more-menu">
+        <div class="menu-header"><span>More</span><span class="close-btn" onclick="toggleMenu()">✕</span></div>
+        <ul>
+            <li>About Us</li><li>Safety</li><li>Community</li><li>Privacy Policy</li><li>Terms Of Service</li>
+        </ul>
+    </div>
+
+    <div class="content-area">
+        <div class="glass-panel">
+            <h1>Upgrade Your Space</h1>
+            <p class="subtitle">Don't let the clock stop a breakthrough.</p>
+
+            <div class="pricing-grid">
+                <div class="pricing-card" onclick="selectPlan(this)">
+                    <h3>Monthly</h3>
+                    <p class="price">₱49</p>
+                    <p class="duration">per month</p>
+                </div>
+                <div class="pricing-card popular" onclick="selectPlan(this)">
+                    <div class="popular-badge">BEST VALUE</div>
+                    <h3>Yearly</h3>
+                    <p class="price">₱490</p>
+                    <p class="duration">per year</p>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h4>Time Limits</h4>
+                    <span class="free">20 min sessions</span> <span class="premium">Unlimited Talk Time</span>
+                </div>
+                <div class="feature-item">
+                    <h4>Ad-Free Experience</h4>
+                    <span class="free">Contains Ads</span> <span class="premium">No Ads</span>
+                </div>
+                <div class="feature-item">
+                    <h4>Community Access</h4>
+                    <span class="free">1-on-1 only</span> <span class="premium">Group Support Rooms</span>
+                </div>
+                <div class="feature-item">
+                    <h4>Professional Help</h4>
+                    <span class="free">None</span> <span class="premium">Psychologist Consults</span><span class="beta-tag">Soon</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="alert('Proceeding to secure payment gateway for ₱49 subscription...')">Subscribe Now</button>
+            <p class="guarantee">Cancel anytime. Secure, encrypted, and anonymous billing.</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() { document.getElementById('more-menu').classList.toggle('active'); }
+        function selectPlan(el) {
+            document.querySelectorAll('.pricing-card').forEach(p => p.style.borderColor = 'transparent');
+            el.style.borderColor = '#fbbf24';
+        }
+    </script>
+</body>
+</html>

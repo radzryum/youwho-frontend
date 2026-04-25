@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>YouWho! - Friendly Sanctuary</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --soft-teal: #48c9b0;
+            --soft-purple: #c3b1e1;
+            --text-main: #2d3748;
+            --text-muted: #475569;
+            --alert-red: #fc8181;
+            --menu-bg: #161525; 
+            --primary-orange: #ff8c42;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background: var(--bg-gradient);
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+            color: var(--text-main);
+        }
+
+        /* --- Global Header --- */
+        .global-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 3rem; width: 100%; z-index: 100;
+        }
+        
+        .logo-area { display: flex; align-items: center; gap: 0.5rem; font-size: 2rem; font-weight: 900; color: var(--primary-orange); cursor: pointer; }
+        .logo-area span { color: var(--soft-teal); }
+
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+        
+        .hamburger-btn {
+            background: var(--menu-bg); color: white; border: none; 
+            font-size: 1.5rem; cursor: pointer; padding: 0.5rem 0.8rem; 
+            border-radius: 8px; transition: background 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .hamburger-btn:hover { background: var(--primary-orange); }
+
+        /* --- The "More" Menu --- */
+        .more-menu {
+            position: fixed; top: 20px; right: 20px; width: 300px;
+            background-color: var(--menu-bg); color: white;
+            border-radius: 16px; padding: 1rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none; flex-direction: column; z-index: 200;
+        }
+        .more-menu.active { display: flex; }
+        
+        .menu-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 1.5rem 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 1.2rem; font-weight: 500;
+        }
+        .menu-header .close-btn { cursor: pointer; font-size: 1.5rem; transition: 0.2s;}
+        .menu-header .close-btn:hover { color: var(--alert-red); }
+        
+        .more-menu ul { list-style: none; padding: 0; margin-top: 0.5rem; }
+        .more-menu li { padding: 1rem 1.5rem; cursor: pointer; font-size: 1.05rem; font-weight: 500; transition: background 0.2s;}
+        .more-menu li:hover { background-color: rgba(255,255,255,0.1); color: var(--soft-teal);}
+
+        /* --- Screen Management --- */
+        .screen {
+            display: none; flex: 1; width: 100%;
+            overflow-y: auto; padding: 0 3rem 3rem 3rem;
+            animation: fadeIn 0.4s ease;
+        }
+        .screen.active { display: flex; flex-direction: column; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- Layout Fixes for Landing --- */
+        .split-layout {
+            display: flex; flex-direction: column; width: 100%; max-width: 1400px; 
+            margin: 0 auto; gap: 3rem; flex: 1; padding-top: 1rem;
+        }
+        @media (min-width: 1024px) {
+            .split-layout { flex-direction: row; align-items: center; }
+        }
+
+        /* Improved Left Pane Alignment */
+        .left-pane { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-right: 2rem; max-width: 600px; }
+        
+        /* Adjusted Responsive Hero Text */
+        .hero-text {
+            font-size: clamp(2rem, 3.5vw, 3.5rem); 
+            font-weight: 900; line-height: 1.15; margin-bottom: 2rem;
+            text-transform: uppercase; letter-spacing: -0.5px; color: #111827;
+        }
+
+        .auth-buttons { display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 380px; }
+
+        .btn {
+            width: 100%; padding: 1.2rem; border-radius: 50px; border: none; font-size: 1.1rem;
+            font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        .btn-google { background-color: white; color: var(--text-main); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .btn-primary { background-color: var(--soft-teal); color: white; }
+        .btn-secondary { background: rgba(255,255,255,0.5); border: 2px solid white; color: var(--text-main); }
+        .btn-secondary:hover { background: white; }
+        
+        /* Fixed Social Row and Icons */
+        .social-row { display: flex; gap: 1rem; margin-left: 4rem; margin-top: 2rem; justify-content: flex-start; max-width: 380px; }
+        .social-icon { 
+            width: 50px; height: 50px; border-radius: 50%; background: white; 
+            display: flex; justify-content: center; align-items: center; 
+            color: #1e293b; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; 
+        }
+        .social-icon:hover { transform: scale(1.1); color: var(--soft-teal); }
+
+        .terms-text { font-size: 0.8rem; color: #334155; margin-top: 2rem; max-width: 380px; line-height: 1.6; }
+
+        /* Right Pane Video Preview */
+        .right-pane {
+            flex: 1.2; display: flex; justify-content: center; align-items: center; height: 100%; min-height: 450px; padding-bottom: 2rem;
+        }
+        
+        .video-preview-card {
+            width: 100%; height: 100%; max-height: 600px;
+            background: #1a202c; border-radius: 20px; overflow: hidden;
+            display: flex; border: 4px solid var(--primary-orange);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2); position: relative;
+        }
+        
+        .preview-feed { flex: 1; background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; position: relative; }
+        .preview-left { background-image: url('https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80'); border-right: 2px solid #2d3748; }
+        .preview-right { background-image: url('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80'); }
+        
+        .mock-avatar { font-size: 6rem; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3)); z-index: 2;}
+        .blur-overlay { width: 100%; height: 100%; position: absolute; top:0; left:0; backdrop-filter: blur(8px); background: rgba(0,0,0,0.2); }
+
+        /* --- Glass Panel Forms --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.6); border-radius: 25px;
+            padding: 3rem; width: 100%; max-width: 500px; margin: auto;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+        }
+        .glass-panel.wide { max-width: 800px; }
+
+        .input-group { margin-bottom: 1.2rem; width: 100%; }
+        .input-group label { display: block; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: #1e293b; }
+        .input-group input { width: 100%; padding: 1.2rem; border-radius: 15px; border: none; background: rgba(255,255,255,0.8); outline: none; font-size: 1rem; transition: 0.3s;}
+        .input-group input:focus { background: white; border: 2px solid var(--soft-teal); }
+
+        /* Dashboard Emotion Grid */
+        .grid-emotions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0; }
+        @media (min-width: 768px) { .grid-emotions { grid-template-columns: repeat(4, 1fr); } }
+        
+        .mood-bubble { background: rgba(255,255,255,0.7); border-radius: 20px; padding: 1.5rem; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
+        .mood-bubble:hover { background: white; transform: translateY(-3px); }
+        .mood-bubble.selected { border-color: var(--soft-teal); background: white; box-shadow: 0 4px 15px rgba(72, 201, 176, 0.3); }
+        .mood-bubble span { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+
+        .toggle-container { display: flex; background: rgba(255,255,255,0.5); border-radius: 30px; padding: 0.4rem; margin-bottom: 2rem; }
+        .toggle-btn { flex: 1; padding: 1rem; border-radius: 25px; border: none; background: transparent; font-weight: bold; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+        .toggle-btn.active { background: white; color: var(--text-main); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+
+        /* --- Active Video Call Screen --- */
+        #screen-video { padding: 0; background: #111827; flex-direction: column; height: 100%; position: relative; }
+        #screen-video .global-header { background: #111827; padding: 1rem 2rem; border-bottom: 1px solid #1f2937; }
+        #screen-video .logo-area { color: white; }
+        
+        .active-call-container { flex: 1; display: flex; flex-direction: column; padding: 1rem; gap: 1rem; height: calc(100% - 80px); }
+        @media (min-width: 1024px) { .active-call-container { flex-direction: row; padding: 2rem; } }
+
+        .video-box { flex: 1; border-radius: 20px; overflow: hidden; position: relative; background: #1f2937; display: flex; justify-content: center; align-items: center; border: 2px solid #334155;}
+        
+        .badge { position: absolute; top: 1rem; left: 1rem; background: rgba(0,0,0,0.6); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; z-index: 3; font-weight: bold;}
+
+        /* Controls */
+        .video-controls { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; gap: 1rem; z-index: 20; background: rgba(0,0,0,0.7); padding: 1rem 2rem; border-radius: 50px; backdrop-filter: blur(10px); }
+        .control-btn { width: 50px; height: 50px; border-radius: 50%; border: none; font-size: 1.2rem; cursor: pointer; background: rgba(255,255,255,0.2); color: white; transition: 0.2s; display: flex; justify-content: center; align-items: center;}
+        .control-btn:hover { background: rgba(255,255,255,0.4); }
+        .control-btn.end { background: var(--alert-red); }
+
+        .card-wrapper { width: 100%; display: flex; justify-content: center; position: absolute; bottom: 100px; left: 0; z-index: 15; padding: 0 1rem; }
+        .floating-card { background: rgba(255,255,255,0.95); padding: 1.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); text-align: center; max-width: 500px; width: 100%; }
+        .floating-card p { color: var(--text-main); font-weight: bold; font-size: 1.2rem; margin-bottom: 1rem; }
+        .card-actions { display: flex; gap: 0.8rem; }
+        .card-actions button { flex: 1; padding: 1rem; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .card-actions .shuffle { background: #f1f5f9; color: var(--text-main); }
+        .card-actions .shuffle:hover { background: #e2e8f0; }
+        .card-actions .pass { background: #ffe4e6; color: #e11d48; }
+        .card-actions .pass:hover { background: #fecdd3; }
+
+        /* --- Waiting Room Overlay --- */
+        .waiting-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-gradient); z-index: 50;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        @keyframes pulse-slow { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .waiting-spinner { font-size: 5rem; animation: pulse-slow 1.5s infinite; margin-bottom: 1rem;}
+    </style>
+</head>
+<body>
+
+    <header class="global-header">
+        <div class="logo-area" onclick="nav('screen-landing')">
+            🦉 You<span>Who!</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary" style="background: white; border: none; padding: 0.6rem 1.5rem; font-size: 0.95rem; margin: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" onclick="window.location.href='premium.html'">⭐ Get Premium</button>
+            <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
+        </div>
+    </header>
+
+    <div id="more-menu" class="more-menu">
+        <div class="menu-header">
+            <span>More</span>
+            <span class="close-btn" onclick="toggleMenu()">✕</span>
+        </div>
+        <ul>
+            <li onclick="window.location.href='info.html#about'">About Us</li>
+            <li onclick="window.location.href='info.html#safety'">Safety</li>
+            <li onclick="window.location.href='info.html#community'">Community</li>
+            <li onclick="window.location.href='info.html#privacy'">Privacy Policy</li>
+            <li onclick="window.location.href='info.html#terms'">Terms Of Service</li>
+            <li onclick="window.location.href='info.html#contact'">Contact Us</li>
+            <li onclick="window.location.href='info.html#faq'">FAQ</li>
+        </ul>
+    </div>
+
+    <div id="screen-landing" class="screen active">
+        <div class="split-layout">
+            <div class="left-pane">
+                <h1 class="hero-text">Find A Supportive Listener Anonymously.</h1>
+                
+                <div class="auth-buttons">
+                    <button class="btn btn-google" onclick="loginWithGoogle()">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width: 20px;">
+                        Connect with Google
+                    </button>
+                    <div style="text-align: center; color: #64748b; font-size: 0.9rem; margin: 0.5rem 0;">OR</div>
+                    <button class="btn btn-primary" onclick="nav('screen-signup')">Create Anonymous Alias</button>
+                    <button class="btn btn-secondary" onclick="nav('screen-login')">Log In</button>
+                </div>
+
+                <div class="social-row">
+                    <div class="social-icon" title="Facebook">
+                        <svg viewBox="0 0 320 512" width="20" fill="currentColor"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+                    </div>
+                    <div class="social-icon" title="X (Twitter)">
+                        <svg viewBox="0 0 512 512" width="20" fill="currentColor"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.6 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
+                    </div>
+                    <div class="social-icon" title="TikTok">
+                        <svg viewBox="0 0 448 512" width="20" fill="currentColor"><path d="M448 209.9a210.1 210.1 0 0 1 -122.8-39.3V349.4A162.6 162.6 0 1 1 185 188.3V278.2a74.6 74.6 0 1 0 52.2 71.2V0l88 0a121.2 121.2 0 0 0 1.9 22.2h0A122.2 122.2 0 0 0 381 102.4a121.4 121.4 0 0 0 67 20.1z"/></svg>
+                    </div>
+                    <div class="social-icon" title="Email">
+                        <svg viewBox="0 0 512 512" width="20" fill="currentColor"><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/></svg>
+                    </div>
+                </div>
+
+                <div class="terms-text">
+                    By creating an account or logging in, you certify that:<br>
+                    <input type="checkbox" checked disabled style="margin-right: 5px;"> I am at least 18 years old.<br>
+                    <input type="checkbox" checked disabled style="margin-right: 5px;"> I have read and agree to the Terms Of Service and Privacy Policy.
+                </div>
+            </div>
+
+            <div class="right-pane">
+                <div class="video-preview-card">
+                    <div class="preview-feed preview-left">
+                        <div class="blur-overlay"></div>
+                        <div class="mock-avatar">🦊</div>
+                    </div>
+                    <div class="preview-feed preview-right">
+                        <div class="blur-overlay"></div>
+                        <div class="mock-avatar">🐼</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-signup" class="screen">
+        <div class="glass-panel">
+            <h2 style="font-size: 2.5rem; margin-bottom: 0.5rem; text-align: center;">Create Alias</h2>
+            <p style="text-align: center; margin-bottom: 2rem; color: #475569;">Your identity remains completely hidden.</p>
+            
+            <div class="input-group">
+                <label>Anonymous Alias</label>
+                <input type="text" id="signup-alias" placeholder="e.g., SleepyPanda">
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="signup-email" placeholder="Used for account recovery only">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="signup-password" placeholder="Create a strong password">
+            </div>
+            <button class="btn btn-primary" style="margin-top: 1rem;" onclick="signUpWithEmail()">Enter Sanctuary</button>
+        </div>
+    </div>
+
+    <div id="screen-login" class="screen">
+        <div class="glass-panel">
+            <h2 style="font-size: 2.5rem; margin-bottom: 0.5rem; text-align: center;">Welcome Back</h2>
+            <p style="text-align: center; margin-bottom: 2rem; color: #475569;">Continue your healing journey.</p>
+            
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="login-email" placeholder="Enter your email">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            <button class="btn btn-primary" style="margin-top: 1rem;" onclick="loginWithEmail()">Log In</button>
+        </div>
+    </div>
+
+    <div id="screen-emotion" class="screen">
+        <div class="glass-panel wide">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem; text-align: center;">How are you feeling right now?</h2>
+            
+            <div class="grid-emotions">
+                <div class="mood-bubble" onclick="selectMood(this)"><span>😰</span>Anxious</div>
+                <div class="mood-bubble" onclick="selectMood(this)"><span>😔</span>Lonely</div>
+                <div class="mood-bubble" onclick="selectMood(this)"><span>😫</span>Stressed</div>
+                <div class="mood-bubble selected" onclick="selectMood(this)"><span>🙂</span>Okay</div>
+            </div>
+
+            <div class="toggle-container">
+                <button class="toggle-btn active" id="btn-speak" onclick="toggleRole('speak')">I want to: SPEAK</button>
+                <button class="toggle-btn" id="btn-listen" onclick="toggleRole('listen')">I want to: LISTEN</button>
+            </div>
+
+            <button class="btn btn-primary" style="max-width: 400px; margin: 0 auto;" onclick="window.location.href='questionnaire.html'">Continue</button>
+        </div>
+    </div>
+
+    <div id="screen-video" class="screen">
+        <div id="waiting-overlay" class="waiting-overlay">
+            <div class="waiting-spinner">🔍</div>
+            <h2 style="color: #111827;">Searching for a peer...</h2>
+            <p style="color: var(--text-muted); font-weight: 500;">Please wait while we find your match in the queue.</p>
+        </div>
+
+        <div class="active-call-container">
+            <div class="video-box peer">
+                <video id="remoteVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+                <span class="badge" id="remote-badge">Peer</span>
+            </div>
+            <div class="video-box self" style="background-color: #111827;">
+                <video id="localVideo" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+                <span class="badge" id="local-badge">You</span>
+            </div>
+        </div>
+
+        <div class="card-wrapper">
+            <div class="floating-card">
+                <p id="convo-text">"What is one thing that made you smile today?"</p>
+                <div class="card-actions">
+                    <button class="shuffle" onclick="shuffleCard()">Shuffle Card</button>
+                    <button class="pass" onclick="document.getElementById('convo-text').innerText = '... (Passed. Listening...)'">Pass</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-controls">
+            <button class="control-btn" id="btn-mic" title="Toggle Mic" onclick="toggleMic()">🎤</button>
+            <button class="control-btn" id="btn-cam" title="Toggle Cam" onclick="toggleCam()">📷</button>
+            <button class="control-btn" title="AI Shield" onclick="alert('AI Monitor: Scanning for harsh language.')">🛡️</button>
+            <div id="call-timer" style="color: white; font-family: monospace; font-size: 1.2rem; display: flex; align-items: center; padding: 0 1rem; font-weight: bold;">20:00</div>
+            
+            <button class="control-btn" title="Next Peer" onclick="nextPeer()" style="background: #eab308; color: white;">⏭️</button>
+            
+            <button class="control-btn end" title="End Call" onclick="endCallManually()">☎</button>
+        </div>
+    </div>
+
+    <div id="screen-feedback" class="screen">
+        <div class="glass-panel">
+            <h2 style="font-size: 2.5rem; margin-top: 1rem; text-align: center;">How do you feel after talking?</h2>
+            
+            <div style="display: flex; justify-content: center; gap: 3rem; margin: 3rem 0; font-size: 5rem; cursor: pointer;">
+                <span style="transition: 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="alert('Feedback saved!'); nav('screen-emotion')">👎</span>
+                <span style="transition: 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="alert('Feedback saved!'); nav('screen-emotion')">😐</span>
+                <span style="transition: 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="alert('Feedback saved!'); nav('screen-emotion')">👍</span>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.8); padding: 2rem; border-radius: 20px; border: 2px solid var(--soft-purple); cursor: pointer; text-align: center;" onclick="window.location.href='premium.html'">
+                <h4 style="color: var(--soft-teal); font-size: 1.5rem; margin-bottom: 0.5rem;">✨ Enjoyed your session?</h4>
+                <p style="font-size: 1.1rem; margin-bottom: 0;">Unlock unlimited time & professional help with Premium.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    
+    <script>
+        function toggleMenu() { document.getElementById('more-menu').classList.toggle('active'); }
+        
+        function nav(targetId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+            
+            const header = document.querySelector('.global-header');
+            if (targetId === 'screen-video') {
+                header.style.display = 'none';
+            } else {
+                header.style.display = 'flex';
+            }
+        }
+
+        // --- Core Variables ---
+        let selectedMood = localStorage.getItem('userMood') || 'okay';
+        let selectedRole = localStorage.getItem('userRole') || 'speaker'; 
+
+        function selectMood(el) {
+            document.querySelectorAll('.mood-bubble').forEach(m => m.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedMood = el.innerText.replace(/[\u2600-\u27FF\u1F300-\u1F6FF\u1F900-\u1F9FF\u1FA70-\u1FAFF\s]/g, '').toLowerCase().trim();
+            localStorage.setItem('userMood', selectedMood);
+        }
+
+        function toggleRole(role) {
+            document.getElementById('btn-speak').classList.remove('active');
+            document.getElementById('btn-listen').classList.remove('active');
+            document.getElementById('btn-' + role).classList.add('active');
+            selectedRole = role === 'speak' ? 'speaker' : 'listener';
+            localStorage.setItem('userRole', selectedRole);
+        }
+
+        const cards = [
+            "What is one thing that made you smile today?",
+            "If you could fast forward to next week, what are you hoping changes?",
+            "What's a feeling you've been hiding lately?"
+        ];
+        function shuffleCard() {
+            document.getElementById('convo-text').innerText = `"${cards[Math.floor(Math.random() * cards.length)]}"`;
+        }
+
+        let timerInterval; let timeRemaining = 1200; 
+        let socket;
+        let pc; 
+        let localStream; 
+
+        // --- Firebase Config ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCydVNSKdRzAm7IUEXLfsJdgnA1L-iuhkA",
+            authDomain: "youwho-966d4.firebaseapp.com",
+            projectId: "youwho-966d4",
+            storageBucket: "youwho-966d4.firebasestorage.app",
+            messagingSenderId: "377796244984",
+            appId: "1:377796244984:web:e38940b8d374c6d410d20d",
+            measurementId: "G-BG310MMNRH"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        async function loginWithGoogle() {
+            try {
+                const result = await firebase.auth().signInWithPopup(provider);
+                await syncUserWithBackend(result.user);
+                nav('screen-emotion');
+            } catch (error) { alert("Google Login Error: " + error.message); }
+        }
+
+        async function signUpWithEmail() {
+            const email = document.getElementById('signup-email').value;
+            const pass = document.getElementById('signup-password').value;
+            if(!email || !pass) return alert("Please enter email and password");
+            try {
+                const result = await firebase.auth().createUserWithEmailAndPassword(email, pass);
+                await syncUserWithBackend(result.user);
+                nav('screen-emotion');
+            } catch (error) { alert("Signup Error: " + error.message); }
+        }
+
+        async function loginWithEmail() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            if(!email || !pass) return alert("Please enter email and password");
+            try {
+                const result = await firebase.auth().signInWithEmailAndPassword(email, pass);
+                await syncUserWithBackend(result.user);
+                nav('screen-emotion');
+            } catch (error) { alert("Login Error: " + error.message); }
+        }
+
+        async function syncUserWithBackend(user) {
+            const token = await user.getIdToken();
+            const res = await fetch('http://localhost:3001/api/auth/login', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if(data.alias) localStorage.setItem('userAlias', data.alias);
+        }
+
+        window.onload = function() {
+            if(new URLSearchParams(window.location.search).get('startCall') === 'true') {
+                startCall();
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        };
+
+        // --- Real-time Video & Matching ---
+        async function startCall() {
+            nav('screen-video');
+            
+            document.getElementById('waiting-overlay').style.display = 'flex';
+            document.getElementById('call-timer').style.display = 'none';
+
+            const finalRole = localStorage.getItem('userRole') || 'speaker';
+            if (finalRole === 'speaker') {
+                document.getElementById('local-badge').innerText = 'Speaker (You)';
+                document.getElementById('remote-badge').innerText = 'Listener';
+            } else {
+                document.getElementById('local-badge').innerText = 'Listener (You)';
+                document.getElementById('remote-badge').innerText = 'Speaker';
+            }
+
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                document.getElementById('localVideo').srcObject = localStream;
+            } catch (err) {
+                console.error("Camera access denied", err);
+                alert("Please allow camera/mic access to join the sanctuary.");
+            }
+
+            // Wait for Firebase to load identity before connecting
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (!user) {
+                    document.getElementById('waiting-overlay').innerHTML = `<h2>Session Expired</h2><p>Please log in again to connect.</p>`;
+                    return;
+                }
+
+                const token = await user.getIdToken();
+                socket = io('http://localhost:3001', { auth: { token } });
+
+                socket.on('connect_error', (err) => {
+                    document.getElementById('waiting-overlay').innerHTML = `<h2>Connection Failed</h2><p>${err.message}</p>`;
+                });
+
+                // Get true dynamic data
+                const finalEmotion = localStorage.getItem('userMood') || 'okay';
+                const finalIntensity = parseInt(localStorage.getItem('userIntensity')) || 3;
+                const finalTopics = JSON.parse(localStorage.getItem('userTopics')) || [];
+
+                socket.emit('join-queue', {
+                    role: finalRole,
+                    emotion: finalEmotion,
+                    intensity: finalIntensity,
+                    topics: finalTopics,
+                });
+
+                // Listen for partner skipping
+                socket.on('peer-left', () => {
+                    alert("Your peer has disconnected. Finding a new match...");
+                    resetCallAndRequeue();
+                });
+
+                socket.on('matched', async ({ roomId, role, peerAlias }) => {
+                    document.getElementById('waiting-overlay').style.display = 'none';
+                    document.getElementById('call-timer').style.display = 'flex';
+                    
+                    timeRemaining = 1200; updateTimerDisplay();
+                    clearInterval(timerInterval);
+                    timerInterval = setInterval(() => {
+                        timeRemaining--; updateTimerDisplay();
+                        if (timeRemaining <= 60 && timeRemaining > 0) document.getElementById('call-timer').style.color = '#fc8181';
+                        if (timeRemaining <= 0) {
+                            endCallManually();
+                            alert("Your 20-minute session has ended.");
+                            window.location.href = 'premium.html'; 
+                        }
+                    }, 1000);
+                    
+                    pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+
+                    if (localStream) {
+                        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+                    }
+
+                    pc.ontrack = (event) => {
+                        document.getElementById('remoteVideo').srcObject = event.streams[0];
+                    };
+
+                    pc.onicecandidate = ({ candidate }) => {
+                        if (candidate) socket.emit('ice-candidate', { roomId, candidate });
+                    };
+
+                    if (role === 'speaker') {
+                        const offer = await pc.createOffer();
+                        await pc.setLocalDescription(offer);
+                        socket.emit('offer', { roomId, sdp: offer });
+                    }
+
+                    socket.on('offer', async ({ sdp, from }) => {
+                        await pc.setRemoteDescription(new RTCSessionDescription(sdp));
+                        const answer = await pc.createAnswer();
+                        await pc.setLocalDescription(answer);
+                        socket.emit('answer', { roomId, sdp: answer });
+                    });
+
+                    socket.on('answer', async ({ sdp }) => {
+                        await pc.setRemoteDescription(new RTCSessionDescription(sdp));
+                    });
+
+                    socket.on('ice-candidate', async ({ candidate }) => {
+                        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+                    });
+                });
+            });
+        }
+
+        // --- Controls ---
+        function toggleMic() {
+            if (!localStream) return;
+            const audioTrack = localStream.getAudioTracks()[0];
+            if (audioTrack) {
+                audioTrack.enabled = !audioTrack.enabled;
+                document.getElementById('btn-mic').style.backgroundColor = audioTrack.enabled ? 'rgba(255,255,255,0.2)' : 'var(--alert-red)';
+            }
+        }
+
+        function toggleCam() {
+            if (!localStream) return;
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (videoTrack) {
+                videoTrack.enabled = !videoTrack.enabled;
+                document.getElementById('btn-cam').style.backgroundColor = videoTrack.enabled ? 'rgba(255,255,255,0.2)' : 'var(--alert-red)';
+            }
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('call-timer').innerText = 
+                `${Math.floor(timeRemaining / 60).toString().padStart(2, '0')}:${(timeRemaining % 60).toString().padStart(2, '0')}`;
+        }
+
+        // --- The Omegle Loop Logic ---
+        function nextPeer() {
+            socket.emit('leave-room');
+            resetCallAndRequeue();
+        }
+
+        function resetCallAndRequeue() {
+            if (pc) {
+                pc.close();
+                pc = null;
+            }
+            
+            document.getElementById('remoteVideo').srcObject = null;
+            document.getElementById('waiting-overlay').style.display = 'flex';
+            document.getElementById('call-timer').style.display = 'none';
+            clearInterval(timerInterval);
+            
+            const finalRole = localStorage.getItem('userRole') || 'speaker';
+            const finalEmotion = localStorage.getItem('userMood') || 'okay';
+            const finalIntensity = parseInt(localStorage.getItem('userIntensity')) || 3;
+            const finalTopics = JSON.parse(localStorage.getItem('userTopics')) || [];
+
+            socket.emit('join-queue', {
+                role: finalRole,
+                emotion: finalEmotion,
+                intensity: finalIntensity,
+                topics: finalTopics,
+            });
+        }
+
+        function endCallManually() { 
+            clearInterval(timerInterval); 
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            if (pc) pc.close(); 
+            
+            if (socket) {
+                socket.emit('leave-room');
+                socket.disconnect(); 
+            }
+            nav('screen-feedback'); 
+        }
+    </script>
+</body>
+</html>

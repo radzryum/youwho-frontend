@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouWho! - Pre-Session Check-in</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --soft-teal: #48c9b0;
+            --text-main: #2d3748;
+            --text-muted: #475569;
+            --menu-bg: #161525; 
+            --primary-orange: #ff8c42;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background: var(--bg-gradient);
+            display: flex; flex-direction: column;
+            min-height: 100vh; overflow-x: hidden; color: var(--text-main);
+        }
+
+        /* --- Global Header --- */
+        .global-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 3rem; width: 100%; z-index: 100;
+        }
+        .logo-area { display: flex; align-items: center; gap: 0.5rem; font-size: 2rem; font-weight: 900; color: var(--primary-orange); cursor: pointer; }
+        .logo-area span { color: var(--soft-teal); }
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+        .hamburger-btn {
+            background: var(--menu-bg); color: white; border: none; 
+            font-size: 1.5rem; cursor: pointer; padding: 0.5rem 0.8rem; 
+            border-radius: 8px; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .hamburger-btn:hover { background: var(--primary-orange); }
+
+        .more-menu {
+            position: fixed; top: 20px; right: 20px; width: 300px; background-color: var(--menu-bg); color: white;
+            border-radius: 16px; padding: 1rem 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: none; flex-direction: column; z-index: 200;
+        }
+        .more-menu.active { display: flex; }
+        .menu-header { display: flex; justify-content: space-between; padding: 0 1.5rem 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 1.2rem; font-weight: 500; }
+        .menu-header .close-btn { cursor: pointer; font-size: 1.5rem; }
+        .menu-header .close-btn:hover { color: #fc8181; }
+        .more-menu ul { list-style: none; padding: 0; margin-top: 0.5rem; }
+        .more-menu li { padding: 1rem 1.5rem; cursor: pointer; font-size: 1.05rem; transition: 0.2s;}
+        .more-menu li:hover { background-color: rgba(255,255,255,0.1); color: var(--soft-teal);}
+
+        /* --- Glass Panel Form --- */
+        .content-area { flex: 1; display: flex; justify-content: center; align-items: center; padding: 2rem; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.6); border-radius: 25px;
+            padding: 3rem; width: 100%; max-width: 700px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        h2 { text-align: center; margin-bottom: 0.5rem; font-size: 2.2rem; color: #1e293b; }
+        p.subtitle { text-align: center; margin-bottom: 2.5rem; font-size: 1.1rem; color: var(--text-muted); }
+
+        .question-card { background: rgba(255,255,255,0.8); padding: 1.5rem; border-radius: 20px; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.5); }
+        .question-card h4 { margin-bottom: 1.2rem; font-size: 1.1rem; color: #1e293b;}
+        
+        .scale-group { display: flex; justify-content: space-between; max-width: 400px; margin: 0 auto; }
+        .scale-btn { 
+            width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; 
+            background: transparent; color: var(--text-main); font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .scale-btn:hover { background: white; transform: scale(1.05); }
+        .scale-btn.selected { background: var(--soft-teal); color: white; border-color: var(--soft-teal); box-shadow: 0 5px 15px rgba(72, 201, 176, 0.4); }
+        .scale-labels { display: flex; justify-content: space-between; margin-top: 0.8rem; font-size: 0.85rem; color: var(--text-muted); font-weight: bold; max-width: 400px; margin-left: auto; margin-right: auto; }
+
+        .chip-group { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+        .chip { 
+            padding: 0.8rem 1.2rem; border-radius: 25px; background: rgba(255,255,255,0.6);
+            border: 2px solid transparent; color: var(--text-main); font-size: 0.95rem; cursor: pointer; transition: 0.2s; font-weight: 600;
+        }
+        .chip:hover { background: white; }
+        .chip.selected { background: white; border-color: var(--soft-teal); color: var(--soft-teal); box-shadow: 0 4px 10px rgba(72, 201, 176, 0.15); }
+
+        textarea { width: 100%; padding: 1.2rem; border-radius: 15px; border: none; background: rgba(255,255,255,0.6); resize: none; outline: none; height: 100px; font-size: 1rem; transition: 0.3s; color: var(--text-main);}
+        textarea:focus { border: 2px solid var(--soft-teal); background: white; }
+
+        .btn { width: 100%; padding: 1.2rem; border-radius: 50px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 1.5rem; transition: 0.2s; background-color: var(--soft-teal); color: white; box-shadow: 0 4px 15px rgba(72, 201, 176, 0.3);}
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(72, 201, 176, 0.4); }
+    </style>
+</head>
+<body>
+
+    <header class="global-header">
+        <div class="logo-area" onclick="window.location.href='index.html'">
+            🦉 You<span>Who!</span>
+        </div>
+        <div class="header-actions">
+            <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
+        </div>
+    </header>
+
+    <div id="more-menu" class="more-menu">
+        <div class="menu-header"><span>More</span><span class="close-btn" onclick="toggleMenu()">✕</span></div>
+        <ul>
+            <li>About Us</li><li>Safety</li><li>Community</li><li>Privacy Policy</li><li>Terms Of Service</li>
+        </ul>
+    </div>
+
+    <div class="content-area">
+        <div class="glass-panel">
+            <h2>Let's set the stage.</h2>
+            <p class="subtitle">This helps us match you with the best peer.</p>
+
+            <div class="question-card">
+                <h4>1. How intense is your feeling right now?</h4>
+                <div class="scale-group">
+                    <button class="scale-btn" onclick="selectScale(this)">1</button>
+                    <button class="scale-btn" onclick="selectScale(this)">2</button>
+                    <button class="scale-btn selected" onclick="selectScale(this)">3</button>
+                    <button class="scale-btn" onclick="selectScale(this)">4</button>
+                    <button class="scale-btn" onclick="selectScale(this)">5</button>
+                </div>
+                <div class="scale-labels"><span>Mild</span><span>Overwhelming</span></div>
+            </div>
+
+            <div class="question-card">
+                <h4>2. Are you dealing with any of these? (Select all that apply)</h4>
+                <div class="chip-group">
+                    <div class="chip">School Stress</div>
+                    <div class="chip">Relationship Issues</div>
+                    <div class="chip">Work Anxiety</div>
+                    <div class="chip">Grief / Loss</div>
+                    <div class="chip">Just need to vent</div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h4>3. Any brief context for your listener? (Optional)</h4>
+                <textarea placeholder="e.g., I have a big exam coming up and I'm freezing..."></textarea>
+            </div>
+
+            <button class="btn" onclick="submitQuestionnaire()">Find My Peer</button>
+        </div>
+    </div>
+
+    <script>
+        let intensity = 3; // Default
+        let selectedTopics = [];
+
+        function toggleMenu() { document.getElementById('more-menu').classList.toggle('active'); }
+        
+        function selectScale(el) {
+            document.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            intensity = parseInt(el.innerText);
+        }
+
+        // Add event listeners to chips to track selections
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                const topic = this.innerText;
+                if(this.classList.contains('selected')) {
+                    selectedTopics.push(topic);
+                } else {
+                    selectedTopics = selectedTopics.filter(t => t !== topic);
+                }
+            });
+        });
+
+        function submitQuestionnaire() {
+            // Save data to browser memory
+            localStorage.setItem('userIntensity', intensity);
+            localStorage.setItem('userTopics', JSON.stringify(selectedTopics));
+            
+            // Redirect to loading animation
+            window.location.href = 'loading.html';
+        }
+    </script>
+</body>
+</html>
