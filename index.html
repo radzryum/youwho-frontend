@@ -584,34 +584,7 @@
                         }
                     }, 1000);
                     
-                    // --- METERED TURN SERVER INTEGRATION ---
-                    pc = new RTCPeerConnection({
-                        iceServers: [
-                            {
-                                urls: "stun:stun.relay.metered.ca:80",
-                            },
-                            {
-                                urls: "turn:global.relay.metered.ca:80",
-                                username: "a0cb64c662886d412525d87e",
-                                credential: "QCOVc6niZTzbgkg5",
-                            },
-                            {
-                                urls: "turn:global.relay.metered.ca:80?transport=tcp",
-                                username: "a0cb64c662886d412525d87e",
-                                credential: "QCOVc6niZTzbgkg5",
-                            },
-                            {
-                                urls: "turn:global.relay.metered.ca:443",
-                                username: "a0cb64c662886d412525d87e",
-                                credential: "QCOVc6niZTzbgkg5",
-                            },
-                            {
-                                urls: "turns:global.relay.metered.ca:443?transport=tcp",
-                                username: "a0cb64c662886d412525d87e",
-                                credential: "QCOVc6niZTzbgkg5",
-                            },
-                        ]
-                    });
+                    pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
 
                     if (localStream) {
                         localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
